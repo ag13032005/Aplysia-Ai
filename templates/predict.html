@@ -1,0 +1,218 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container mt-5 pt-4">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card shadow-lg">
+                <div class="card-header bg-primary text-white">
+                    <h3 class="mb-0"><i class="fas fa-stethoscope"></i> Seizure Prediction</h3>
+                    <small>Enter patient vitals for AI-powered seizure risk assessment</small>
+                </div>
+                <div class="card-body">
+                    <div class="alert alert-primary d-flex align-items-center">
+                        <i class="fas fa-notes-medical fa-lg me-2 text-primary"></i>
+                        <div>
+                            <strong>Patient Vitals Assessment:</strong> Input the recorded heart rate, muscle activity (EMG), oxygen saturation (SpO₂), and blood pressure to generate an instant seizure risk evaluation.
+                        </div>
+                    </div>
+                    
+                    <form id="predictionForm" action="{{ url_for('predict_submit') }}" method="POST" novalidate>
+                        <div class="mb-3">
+                            <label for="heartbeat" class="form-label">
+                                <i class="fas fa-heartbeat text-danger"></i> Heartbeat (BPM)
+                            </label>
+                            <input type="number" step="any" min="30" max="220" class="form-control" id="heartbeat" 
+                                   name="heartbeat" value="{{ data.heartbeat }}" placeholder="e.g. 85" required data-min="30" data-max="220" data-unit="BPM">
+                            <small class="text-muted d-block">Allowed range: 30 - 220 BPM (Normal: 60-100 BPM)</small>
+                            <div class="range-error" id="heartbeat-error"></div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="emg" class="form-label">
+                                <i class="fas fa-waveform text-warning"></i> EMG Value (0-1024)
+                            </label>
+                            <input type="number" step="any" min="0" max="1024" class="form-control" id="emg" 
+                                   name="emg" value="{{ data.emg }}" placeholder="e.g. 50" required data-min="0" data-max="1024" data-unit="">
+                            <small class="text-muted d-block">Allowed range: 0 - 1024 (Signal intensity)</small>
+                            <div class="range-error" id="emg-error"></div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="spo2" class="form-label">
+                                <i class="fas fa-lungs text-info"></i> SpO₂ (%)
+                            </label>
+                            <input type="number" step="any" min="50" max="100" class="form-control" id="spo2" 
+                                   name="spo2" value="{{ data.spo2 }}" placeholder="e.g. 98" required data-min="50" data-max="100" data-unit="%">
+                            <small class="text-muted d-block">Allowed range: 50 - 100% (Normal: 95-100%)</small>
+                            <div class="range-error" id="spo2-error"></div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="bloodpressure" class="form-label">
+                                <i class="fas fa-tachometer-alt text-success"></i> Blood Pressure (mmHg)
+                            </label>
+                            <input type="number" step="any" min="50" max="250" class="form-control" id="bloodpressure" 
+                                   name="bloodpressure" value="{{ data.bloodpressure }}" placeholder="e.g. 120" required data-min="50" data-max="250" data-unit="mmHg">
+                            <small class="text-muted d-block">Allowed range: 50 - 250 mmHg (Normal: 90 - 120 mmHg)</small>
+                            <div class="range-error" id="bloodpressure-error"></div>
+                        </div>
+                        
+                        <div class="d-grid gap-2 mt-4">
+                            <button type="submit" class="btn btn-primary btn-lg" id="btnSubmit">
+                                <i class="fas fa-microchip"></i> Analyze & Predict
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            
+            <div class="card mt-4">
+                <div class="card-header bg-info text-white">
+                    <h5 class="mb-0"><i class="fas fa-chart-line"></i> Reference Ranges</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h6>Normal Values:</h6>
+                            <ul class="list-unstyled">
+                                <li>❤️ Heartbeat: 60-100 BPM</li>
+                                <li>📊 EMG: 0-100 (rest), 100-500 (active)</li>
+                                <li>💨 SpO₂: 95-100%</li>
+                                <li>🩸 BP: 90 - 120 mmHg</li>
+                            </ul>
+                        </div>
+                        <div class="col-md-6">
+                            <h6>Seizure Indicators:</h6>
+                            <ul class="list-unstyled">
+                                <li>⚠️ Heartbeat > 120 or < 50 BPM</li>
+                                <li>⚠️ EMG spiking > 800</li>
+                                <li>⚠️ SpO₂ < 90%</li>
+                                <li>⚠️ BP deviation > 20%</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+/* Glowing Red Box Effect for Out-of-Range Inputs */
+.is-out-of-range {
+    border-color: #dc3545 !important;
+    background-color: #fff6f6 !important;
+    box-shadow: 0 0 12px rgba(220, 53, 69, 0.8), inset 0 0 4px rgba(220, 53, 69, 0.3) !important;
+    animation: glow-pulse-red 1.2s infinite alternate ease-in-out;
+}
+
+@keyframes glow-pulse-red {
+    0% {
+        box-shadow: 0 0 6px rgba(220, 53, 69, 0.5), inset 0 0 2px rgba(220, 53, 69, 0.2);
+        border-color: #e63946;
+    }
+    100% {
+        box-shadow: 0 0 16px rgba(220, 53, 69, 0.95), inset 0 0 6px rgba(220, 53, 69, 0.4);
+        border-color: #dc3545;
+    }
+}
+
+.range-error {
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: #dc3545;
+    margin-top: 4px;
+    display: none;
+}
+
+.range-error.active {
+    display: block;
+    animation: fadeIn 0.25s ease-in;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(-3px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+</style>
+
+<script>
+const fields = ['heartbeat', 'emg', 'spo2', 'bloodpressure'];
+
+function validateField(fieldId) {
+    const input = document.getElementById(fieldId);
+    const errorDiv = document.getElementById(fieldId + '-error');
+    if (!input || !errorDiv) return true;
+
+    const min = parseFloat(input.dataset.min);
+    const max = parseFloat(input.dataset.max);
+    const unit = input.dataset.unit ? ' ' + input.dataset.unit : '';
+    const rawVal = input.value.trim();
+
+    if (rawVal === '') {
+        input.classList.add('is-out-of-range');
+        errorDiv.innerHTML = `<i class="fas fa-exclamation-triangle"></i> This value is required.`;
+        errorDiv.classList.add('active');
+        return false;
+    }
+
+    const val = parseFloat(rawVal);
+    if (isNaN(val) || val < min || val > max) {
+        input.classList.add('is-out-of-range');
+        errorDiv.innerHTML = `<i class="fas fa-exclamation-circle"></i> Value out of range! Must be between <strong>${min}</strong> and <strong>${max}${unit}</strong>.`;
+        errorDiv.classList.add('active');
+        return false;
+    } else {
+        input.classList.remove('is-out-of-range');
+        errorDiv.innerHTML = '';
+        errorDiv.classList.remove('active');
+        return true;
+    }
+}
+
+function validateAllFields() {
+    let isValid = true;
+    let firstInvalid = null;
+
+    fields.forEach(id => {
+        const ok = validateField(id);
+        if (!ok) {
+            isValid = false;
+            if (!firstInvalid) firstInvalid = document.getElementById(id);
+        }
+    });
+
+    if (!isValid && firstInvalid) {
+        firstInvalid.focus();
+    }
+
+    return isValid;
+}
+
+// Attach real-time validation events
+document.addEventListener('DOMContentLoaded', () => {
+    fields.forEach(id => {
+        const input = document.getElementById(id);
+        if (input) {
+            input.addEventListener('input', () => validateField(id));
+            input.addEventListener('change', () => validateField(id));
+            input.addEventListener('blur', () => validateField(id));
+        }
+    });
+
+    const form = document.getElementById('predictionForm');
+    if (form) {
+        form.addEventListener('submit', (e) => {
+            if (!validateAllFields()) {
+                e.preventDefault();
+                e.stopPropagation();
+            }
+        });
+    }
+
+    // Run initial validation check
+    validateAllFields();
+});
+</script>
+{% endblock %}

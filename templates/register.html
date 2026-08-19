@@ -1,0 +1,295 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container mt-5 pt-4">
+    <div class="row justify-content-center">
+        <div class="col-md-7">
+            <div class="card shadow-lg border-0">
+                <div class="card-header bg-gradient-primary text-white text-center py-4">
+                    <i class="fas fa-user-plus fa-3x mb-2"></i>
+                    <h3 class="mb-0">Create Account</h3>
+                    <small>Join Aplysia AI for advanced seizure detection</small>
+                </div>
+                <div class="card-body p-5">
+                    <form method="POST" action="{{ url_for('register') }}" onsubmit="return validateRegisterForm()">
+                        <div class="mb-3">
+                            <label for="username" class="form-label">
+                                <i class="fas fa-user"></i> Username
+                            </label>
+                            <div class="input-group">
+                                <span class="input-group-text"><i class="fas fa-user"></i></span>
+                                <input type="text" class="form-control" id="username" name="username" 
+                                       placeholder="Choose a username" required autofocus>
+                            </div>
+                            <small class="text-muted">Username must be unique</small>
+                            <div class="invalid-feedback" id="usernameError"></div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="email" class="form-label">
+                                <i class="fas fa-envelope"></i> Email Address
+                            </label>
+                            <div class="input-group">
+                                <span class="input-group-text"><i class="fas fa-envelope"></i></span>
+                                <input type="email" class="form-control" id="email" name="email" 
+                                       placeholder="your@email.com" required>
+                            </div>
+                            <small class="text-muted">We'll never share your email</small>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="password" class="form-label">
+                                <i class="fas fa-lock"></i> Password
+                            </label>
+                            <div class="input-group">
+                                <span class="input-group-text"><i class="fas fa-key"></i></span>
+                                <input type="password" class="form-control" id="password" name="password" 
+                                       placeholder="Create a password" required>
+                                <button class="btn btn-outline-secondary" type="button" onclick="togglePassword('password', 'toggleIcon1')">
+                                    <i class="fas fa-eye" id="toggleIcon1"></i>
+                                </button>
+                            </div>
+                            <div class="password-strength mt-2">
+                                <div class="progress" style="height: 5px;">
+                                    <div class="progress-bar" id="passwordStrength" role="progressbar" style="width: 0%"></div>
+                                </div>
+                                <small class="text-muted" id="strengthText">Password strength: Weak</small>
+                            </div>
+                            <small class="text-muted">Minimum 6 characters with letters and numbers</small>
+                        </div>
+                        
+                        <div class="mb-4">
+                            <label for="confirm_password" class="form-label">
+                                <i class="fas fa-check-circle"></i> Confirm Password
+                            </label>
+                            <div class="input-group">
+                                <span class="input-group-text"><i class="fas fa-check"></i></span>
+                                <input type="password" class="form-control" id="confirm_password" name="confirm_password" 
+                                       placeholder="Confirm your password" required>
+                                <button class="btn btn-outline-secondary" type="button" onclick="togglePassword('confirm_password', 'toggleIcon2')">
+                                    <i class="fas fa-eye" id="toggleIcon2"></i>
+                                </button>
+                            </div>
+                            <div id="passwordMatch" class="invalid-feedback"></div>
+                        </div>
+                        
+                        <div class="mb-4 form-check">
+                            <input type="checkbox" class="form-check-input" id="terms" required>
+                            <label class="form-check-label" for="terms">
+                                I agree to the <a href="#" data-bs-toggle="modal" data-bs-target="#termsModal">Terms and Conditions</a>
+                            </label>
+                        </div>
+                        
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn btn-primary btn-lg">
+                                <i class="fas fa-user-plus"></i> Register Now
+                            </button>
+                        </div>
+                    </form>
+                    
+                    <div class="text-center mt-4">
+                        <p class="mb-0">Already have an account? 
+                            <a href="{{ url_for('login') }}" class="text-primary fw-bold">
+                                Login here
+                            </a>
+                        </p>
+                        <hr>
+                        <div class="benefits mt-3">
+                            <p class="small text-muted mb-0">By registering, you get:</p>
+                            <div class="row mt-2">
+                                <div class="col-md-4">
+                                    <i class="fas fa-chart-line text-success"></i>
+                                    <small>History Tracking</small>
+                                </div>
+                                <div class="col-md-4">
+                                    <i class="fas fa-bell text-success"></i>
+                                    <small>Alerts</small>
+                                </div>
+                                <div class="col-md-4">
+                                    <i class="fas fa-file-alt text-success"></i>
+                                    <small>Reports</small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Terms and Conditions Modal -->
+<div class="modal fade" id="termsModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header bg-primary text-white">
+                <h5 class="modal-title">Terms and Conditions</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <h6>1. Acceptance of Terms</h6>
+                <p>By registering for Aplysia AI, you agree to these terms and conditions.</p>
+                
+                <h6>2. Medical Disclaimer</h6>
+                <p>Aplysia AI is an assistive tool and not a substitute for professional medical advice. Always consult with healthcare professionals.</p>
+                
+                <h6>3. Data Privacy</h6>
+                <p>Your health data is encrypted and stored securely. We do not share your data with third parties without consent.</p>
+                
+                <h6>4. Accuracy of Predictions</h6>
+                <p>While our model achieves high accuracy, it may not be 100% accurate. Use predictions as reference only.</p>
+                
+                <h6>5. Emergency Situations</h6>
+                <p>In case of emergency, always contact local emergency services immediately.</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary" data-bs-dismiss="modal">I Understand</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+function togglePassword(fieldId, iconId) {
+    const passwordInput = document.getElementById(fieldId);
+    const toggleIcon = document.getElementById(iconId);
+    
+    if (passwordInput.type === 'password') {
+        passwordInput.type = 'text';
+        toggleIcon.classList.remove('fa-eye');
+        toggleIcon.classList.add('fa-eye-slash');
+    } else {
+        passwordInput.type = 'password';
+        toggleIcon.classList.remove('fa-eye-slash');
+        toggleIcon.classList.add('fa-eye');
+    }
+}
+
+// Password strength checker
+document.getElementById('password').addEventListener('input', function() {
+    const password = this.value;
+    const strengthBar = document.getElementById('passwordStrength');
+    const strengthText = document.getElementById('strengthText');
+    
+    let strength = 0;
+    let strengthPercent = 0;
+    let strengthLevel = 'Weak';
+    
+    if (password.length >= 6) strength++;
+    if (password.length >= 8) strength++;
+    if (password.match(/[a-z]/) && password.match(/[A-Z]/)) strength++;
+    if (password.match(/\d/)) strength++;
+    if (password.match(/[^a-zA-Z\d]/)) strength++;
+    
+    strengthPercent = (strength / 5) * 100;
+    
+    if (strengthPercent <= 20) {
+        strengthLevel = 'Very Weak';
+        strengthBar.className = 'progress-bar bg-danger';
+    } else if (strengthPercent <= 40) {
+        strengthLevel = 'Weak';
+        strengthBar.className = 'progress-bar bg-warning';
+    } else if (strengthPercent <= 60) {
+        strengthLevel = 'Fair';
+        strengthBar.className = 'progress-bar bg-info';
+    } else if (strengthPercent <= 80) {
+        strengthLevel = 'Good';
+        strengthBar.className = 'progress-bar bg-primary';
+    } else {
+        strengthLevel = 'Strong';
+        strengthBar.className = 'progress-bar bg-success';
+    }
+    
+    strengthBar.style.width = strengthPercent + '%';
+    strengthText.innerHTML = `Password strength: ${strengthLevel}`;
+});
+
+// Password match validation
+function validatePasswordMatch() {
+    const password = document.getElementById('password').value;
+    const confirm = document.getElementById('confirm_password').value;
+    const matchDiv = document.getElementById('passwordMatch');
+    
+    if (password !== confirm) {
+        matchDiv.innerHTML = 'Passwords do not match!';
+        matchDiv.style.display = 'block';
+        return false;
+    } else if (confirm.length > 0) {
+        matchDiv.innerHTML = 'Passwords match!';
+        matchDiv.style.display = 'block';
+        matchDiv.classList.add('valid-feedback');
+        matchDiv.classList.remove('invalid-feedback');
+        return true;
+    }
+    return false;
+}
+
+document.getElementById('confirm_password').addEventListener('input', validatePasswordMatch);
+document.getElementById('password').addEventListener('input', validatePasswordMatch);
+
+// Form validation
+function validateRegisterForm() {
+    const password = document.getElementById('password').value;
+    const confirm = document.getElementById('confirm_password').value;
+    const terms = document.getElementById('terms').checked;
+    
+    if (password !== confirm) {
+        alert('Passwords do not match!');
+        return false;
+    }
+    
+    if (password.length < 6) {
+        alert('Password must be at least 6 characters long!');
+        return false;
+    }
+    
+    if (!terms) {
+        alert('Please accept the Terms and Conditions');
+        return false;
+    }
+    
+    return true;
+}
+
+// Username availability check (optional)
+let typingTimer;
+const doneTypingInterval = 1000;
+
+document.getElementById('username').addEventListener('keyup', function() {
+    clearTimeout(typingTimer);
+    typingTimer = setTimeout(checkUsernameAvailability, doneTypingInterval);
+});
+
+function checkUsernameAvailability() {
+    const username = document.getElementById('username').value;
+    if (username.length < 3) return;
+    
+    // This would require an API endpoint
+    // For now, just a placeholder
+    console.log('Checking username:', username);
+}
+</script>
+
+<style>
+.bg-gradient-primary {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+}
+.input-group-text {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    border: none;
+}
+.password-strength {
+    font-size: 0.8rem;
+}
+.benefits {
+    background: #f8f9fa;
+    padding: 15px;
+    border-radius: 10px;
+}
+.form-check-input:checked {
+    background-color: #667eea;
+    border-color: #667eea;
+}
+</style>
+{% endblock %}

@@ -1,0 +1,102 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="hero-section">
+    <div class="container">
+        <div class="row align-items-center min-vh-100">
+            <div class="col-lg-6 hero-content">
+                <h1 class="display-4 fw-bold">
+                    <i class="fas fa-brain text-primary"></i> Aplysia AI
+                </h1>
+                <p class="lead">Revolutionizing Epileptic Seizure Detection with IoT and Machine Learning</p>
+                <p class="mb-4">Real-time monitoring and early warning system for better epilepsy management.</p>
+                {% if not session.user_id %}
+                    <a href="{{ url_for('register') }}" class="btn btn-primary btn-lg me-3">
+                        <i class="fas fa-user-plus"></i> Get Started
+                    </a>
+                    <a href="{{ url_for('login') }}" class="btn btn-outline-light btn-lg">
+                        <i class="fas fa-sign-in-alt"></i> Login
+                    </a>
+                {% else %}
+                    <a href="{{ url_for('predict') }}" class="btn btn-primary btn-lg">
+                        <i class="fas fa-stethoscope"></i> Start Prediction
+                    </a>
+                {% endif %}
+            </div>
+            <div class="col-lg-6">
+                <div id="heroCarousel" class="carousel slide" data-bs-ride="carousel">
+                    <div class="carousel-inner">
+                        <div class="carousel-item active">
+                            <img src="https://cdn.dribbble.com/userupload/21255335/file/original-3456430b5be6f8eec71e2bde3ba9ae42.gif" class="d-block w-100 rounded" alt="AI Detection">
+                        </div>
+                        <div class="carousel-item">
+                            <img src="https://cdn.dribbble.com/userupload/21261947/file/original-642e12659184a3a87195840eaa772fcb.gif" class="d-block w-100 rounded" alt="IoT Monitoring">
+                        </div>
+                        <div class="carousel-item">
+                            <img src="https://i.makeagif.com/media/4-02-2016/7dwzm8.gif" class="d-block w-100 rounded" alt="Real-time Alerts">
+                        </div>
+                    </div>
+                    <button class="carousel-control-prev" type="button" data-bs-target="#heroCarousel" data-bs-slide="prev">
+                        <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                    </button>
+                    <button class="carousel-control-next" type="button" data-bs-target="#heroCarousel" data-bs-slide="next">
+                        <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<section class="features py-5">
+    <div class="container">
+        <h2 class="text-center mb-5">Why Choose Aplysia AI?</h2>
+        <div class="row g-4">
+            <div class="col-md-4">
+                <div class="feature-card text-center p-4">
+                    <i class="fas fa-microchip fa-3x mb-3 text-primary"></i>
+                    <h4>IoT Integration</h4>
+                    <p>Real-time data collection from medical sensors for accurate monitoring</p>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="feature-card text-center p-4">
+                    <i class="fas fa-robot fa-3x mb-3 text-primary"></i>
+                    <h4>ML-Powered Predictions</h4>
+                    <p>98.5% accuracy in seizure detection using advanced algorithms</p>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="feature-card text-center p-4">
+                    <i class="fas fa-chart-line fa-3x mb-3 text-primary"></i>
+                    <h4>24/7 Monitoring</h4>
+                    <p>Continuous health tracking with instant alerts for early intervention</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="stats py-5 bg-light">
+    <div class="container">
+        <div class="row text-center">
+            <div class="col-md-3">
+                <div class="stat-number">98.5%</div>
+                <div class="stat-label">Detection Accuracy</div>
+            </div>
+            <div class="col-md-3">
+                <div class="stat-number">500+</div>
+                <div class="stat-label">Patients Helped</div>
+            </div>
+            <div class="col-md-3">
+                <div class="stat-number">24/7</div>
+                <div class="stat-label">Real-time Monitoring</div>
+            </div>
+            <div class="col-md-3">
+                <div class="stat-number">5min</div>
+                <div class="stat-label">Average Response Time</div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

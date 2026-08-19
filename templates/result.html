@@ -1,0 +1,90 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container mt-5 pt-4">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card shadow-lg">
+                <div class="card-header {% if prediction.result.prediction == 'epileptic' %}bg-danger{% elif prediction.result.prediction == 'early prediction' %}bg-warning{% else %}bg-success{% endif %} text-white">
+                    <h3 class="mb-0"><i class="fas fa-chart-bar"></i> Prediction Result</h3>
+                </div>
+                <div class="card-body">
+                    <!-- Input Values -->
+                    <div class="row mb-4">
+                        <div class="col-md-12">
+                            <h5>Input Values:</h5>
+                            <div class="row">
+                                <div class="col-md-3">
+                                    <small class="text-muted">Heartbeat:</small>
+                                    <strong>{{ prediction.data.heartbeat }} BPM</strong>
+                                </div>
+                                <div class="col-md-3">
+                                    <small class="text-muted">EMG:</small>
+                                    <strong>{{ prediction.data.emg }}</strong>
+                                </div>
+                                <div class="col-md-3">
+                                    <small class="text-muted">SpO₂:</small>
+                                    <strong>{{ prediction.data.spo2 }}%</strong>
+                                </div>
+                                <div class="col-md-3">
+                                    <small class="text-muted">BP:</small>
+                                    <strong>{{ prediction.data.bloodpressure }} mmHg</strong>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <hr>
+                    
+                    <!-- Prediction -->
+                    <div class="text-center mb-4">
+                        {% if prediction.result.prediction == 'epileptic' %}
+                            <i class="fas fa-exclamation-triangle fa-4x text-danger"></i>
+                        {% elif prediction.result.prediction == 'early prediction' %}
+                            <i class="fas fa-bell fa-4x text-warning"></i>
+                        {% else %}
+                            <i class="fas fa-check-circle fa-4x text-success"></i>
+                        {% endif %}
+                        
+                        <h2 class="mt-3 {% if prediction.result.prediction == 'epileptic' %}text-danger{% elif prediction.result.prediction == 'early prediction' %}text-warning{% else %}text-success{% endif %}">
+                            {{ prediction.result.recommendation_title }}
+                        </h2>
+                        
+                        {% if prediction.result.confidence > 0 %}
+                            <p class="text-muted">Confidence: {{ "%.1f"|format(prediction.result.confidence) }}%</p>
+                        {% endif %}
+                    </div>
+                    
+                    <hr>
+                    
+                    <!-- Recommendations -->
+                    <div class="recommendations">
+                        <h5><i class="fas fa-clinic-medical"></i> Medical Recommendations:</h5>
+                        <ul class="list-group">
+                            {% for detail in prediction.result.recommendation_details %}
+                                <li class="list-group-item">
+                                    <i class="fas fa-check-circle text-success me-2"></i>
+                                    {{ detail }}
+                                </li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                    
+                    <!-- Action Buttons -->
+                    <div class="d-grid gap-2 d-md-flex justify-content-md-center mt-4">
+                        <a href="{{ url_for('dashboard') }}" class="btn btn-primary">
+                            <i class="fas fa-chart-line"></i> View History
+                        </a>
+                        <a href="{{ url_for('predict') }}" class="btn btn-secondary">
+                            <i class="fas fa-plus"></i> New Prediction
+                        </a>
+                        <button onclick="window.print()" class="btn btn-info">
+                            <i class="fas fa-print"></i> Print Report
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

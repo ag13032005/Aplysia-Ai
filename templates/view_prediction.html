@@ -1,0 +1,86 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container mt-5 pt-4">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card shadow-lg">
+                <div class="card-header bg-info text-white">
+                    <h3 class="mb-0"><i class="fas fa-file-alt"></i> Prediction Details</h3>
+                </div>
+                <div class="card-body">
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <strong>Date & Time:</strong><br>
+                            {{ prediction.created_at }}
+                        </div>
+                        <div class="col-md-6">
+                            <strong>Prediction ID:</strong><br>
+                            #{{ prediction.id }}
+                        </div>
+                    </div>
+                    
+                    <hr>
+                    
+                    <h5>Input Values:</h5>
+                    <div class="row mb-4">
+                        <div class="col-md-3">
+                            <div class="card bg-light">
+                                <div class="card-body text-center">
+                                    <i class="fas fa-heartbeat fa-2x text-danger"></i>
+                                    <h4>{{ prediction.heartbeat }} <small>BPM</small></h4>
+                                    <small>Heartbeat</small>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="card bg-light">
+                                <div class="card-body text-center">
+                                    <i class="fas fa-waveform fa-2x text-warning"></i>
+                                    <h4>{{ prediction.emg }}</h4>
+                                    <small>EMG</small>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="card bg-light">
+                                <div class="card-body text-center">
+                                    <i class="fas fa-lungs fa-2x text-info"></i>
+                                    <h4>{{ prediction.spo2 }}%</h4>
+                                    <small>SpO₂</small>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="card bg-light">
+                                <div class="card-body text-center">
+                                    <i class="fas fa-tachometer-alt fa-2x text-success"></i>
+                                    <h4>{{ prediction.blood_pressure }} <small>mmHg</small></h4>
+                                    <small>BP</small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="alert {% if prediction.prediction == 'epileptic' %}alert-danger{% elif prediction.prediction == 'early prediction' %}alert-warning{% else %}alert-success{% endif %}">
+                        <h5>Prediction Result:</h5>
+                        <strong>{{ prediction.recommendation }}</strong>
+                        {% if prediction.confidence > 0 %}
+                            <br><small>Confidence: {{ "%.1f"|format(prediction.confidence) }}%</small>
+                        {% endif %}
+                    </div>
+                    
+                    <div class="d-grid gap-2 d-md-flex justify-content-md-center">
+                        <a href="{{ url_for('dashboard') }}" class="btn btn-primary">
+                            <i class="fas fa-arrow-left"></i> Back to History
+                        </a>
+                        <button onclick="window.print()" class="btn btn-secondary">
+                            <i class="fas fa-print"></i> Print Details
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
