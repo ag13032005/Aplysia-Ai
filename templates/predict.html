@@ -16,6 +16,13 @@
                             <strong>Patient Vitals Assessment:</strong> Input the recorded heart rate, muscle activity (EMG), oxygen saturation (SpO₂), and blood pressure to generate an instant seizure risk evaluation.
                         </div>
                     </div>
+
+                    <div class="d-flex align-items-center gap-3 mb-4">
+                        <button type="button" class="btn btn-outline-primary" id="fetchThingSpeak">
+                            <i class="fas fa-cloud-download-alt"></i> Fetch Latest Sensor Data
+                        </button>
+                        <span class="small text-muted" id="thingSpeakStatus" role="status"></span>
+                    </div>
                     
                     <form id="predictionForm" action="{{ url_for('predict_submit') }}" method="POST" novalidate>
                         <div class="mb-3">

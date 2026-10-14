@@ -6,6 +6,8 @@ import sqlite3
 import hashlib
 from datetime import datetime
 import os
+from urllib.error import HTTPError, URLError
+from urllib.request import Request, urlopen
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 
@@ -38,6 +40,13 @@ le = bundle['label_encoder']
 feat_names = bundle['features']
 model_name = bundle['model_name']
 model_acc = bundle['accuracy']
+
+# ThingSpeak read configuration. Environment variables take precedence in deployment.
+THINGSPEAK_URL = os.environ.get(
+    'THINGSPEAK_URL',
+    'https://api.thingspeak.com/channels/3347782/feeds.json'
+)
+THINGSPEAK_API_KEY = os.environ.get('THINGSPEAK_API_KEY', '6R41IMC2EPJN4VNW')
 
 # ─── Database Configuration ───────────────────────────────────
 # Use /tmp on serverless environments where local filesystem is read-only
@@ -209,6 +218,32 @@ def save_prediction(user_id, data, prediction_result):
     conn.close()
     return prediction_id
 
+def fetch_latest_thingspeak_data():
+    """Fetch and normalize the latest ThingSpeak sensor reading."""
+    request_url = f'{THINGSPEAK_URL}?api_key={THINGSPEAK_API_KEY}&results=2'
+    request = Request(request_url, headers={'Accept': 'application/json'})
+
+    try:
+        with urlopen(request, timeout=10) as response:
+            payload = response.read().decode('utf-8')
+    except (HTTPError, URLError, TimeoutError) as error:
+        raise RuntimeError('Unable to reach the ThingSpeak channel.') from error
+
+    import json
+    try:
+        feeds = json.loads(payload).get('feeds', [])
+        feed = feeds[-1]
+        data = {
+            'heartbeat': float(feed['field1']),
+            'emg': float(feed['field2']),
+            'spo2': float(feed['field3']),
+            'bloodpressure': float(feed['field4'])
+        }
+    except (KeyError, IndexError, TypeError, ValueError, json.JSONDecodeError) as error:
+        raise RuntimeError('ThingSpeak returned an incomplete sensor reading.') from error
+
+    return data
+
 # ─── Routes ────────────────────────────────────────────────────
 @app.route('/')
 def index():
@@ -346,6 +381,17 @@ def predict():
         'bloodpressure': '120'
     }
     return render_template('predict.html', data=default_data)
+
+@app.route('/api/thingspeak/latest')
+def thingspeak_latest():
+    """Return the latest ThingSpeak reading for the prediction form."""
+    if 'user_id' not in session:
+        return jsonify({'error': 'Authentication required.'}), 401
+
+    try:
+        return jsonify(fetch_latest_thingspeak_data())
+    except RuntimeError as error:
+        return jsonify({'error': str(error)}), 502
 
 @app.route('/predict_submit', methods=['POST'])
 def predict_submit():

@@ -19,6 +19,34 @@ document.addEventListener('DOMContentLoaded', function() {
     tooltipTriggerList.map(function (tooltipTriggerEl) {
         return new bootstrap.Tooltip(tooltipTriggerEl);
     });
+
+    const fetchButton = document.getElementById('fetchThingSpeak');
+    const status = document.getElementById('thingSpeakStatus');
+    if (fetchButton && status) {
+        fetchButton.addEventListener('click', async function() {
+            fetchButton.disabled = true;
+            status.textContent = 'Fetching latest reading...';
+
+            try {
+                const response = await fetch('/api/thingspeak/latest');
+                const data = await response.json();
+                if (!response.ok) throw new Error(data.error || 'Fetch failed.');
+
+                Object.entries(data).forEach(([field, value]) => {
+                    const input = document.getElementById(field);
+                    if (input) input.value = value;
+                    input?.dispatchEvent(new Event('input', { bubbles: true }));
+                });
+                status.textContent = 'Latest sensor data loaded.';
+                status.className = 'small text-success';
+            } catch (error) {
+                status.textContent = error.message;
+                status.className = 'small text-danger';
+            } finally {
+                fetchButton.disabled = false;
+            }
+        });
+    }
 });
 
 // Form validation

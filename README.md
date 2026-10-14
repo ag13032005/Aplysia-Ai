@@ -23,6 +23,9 @@
   - Detailed report view and one-click printable medical summaries.
 - **💡 Actionable Medical Guidance**:
   - Automatically generates customized clinical advice based on risk level (Low Risk, Early Warning, High Risk / Epileptic).
+- **📡 ThingSpeak Sensor Import**:
+  - The prediction form can fetch the latest reading from channel `3347782`.
+  - ThingSpeak fields map to `field1` heartbeat, `field2` EMG, `field3` SpO₂, and `field4` systolic blood pressure.
 
 ---
 
@@ -74,6 +77,8 @@ pip install -r requirements.txt
 ```bash
 python app.py
 ```
+
+For deployment, set `THINGSPEAK_URL` and `THINGSPEAK_API_KEY` environment variables to override the default channel configuration.
 
 Open your browser and navigate to:
 ```
